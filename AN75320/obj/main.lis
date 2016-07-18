@@ -1,0 +1,638 @@
+ 0000                   cpu LMM
+                        .module main.c
+                        .area text(rom, con, rel)
+ 0000                   .dbfile ./main.c
+                        .area data(ram, con, rel)
+ 0000                   .dbfile ./main.c
+ 0000           _i::
+ 0000 0064              .word 100
+ 0002                   .dbfile C:\Users\jblp\DOCUME~1\PSOCDE~1.1PR\AN75320\AN75320\main.c
+ 0002                   .dbsym e i _i I
+                        .area data(ram, con, rel)
+ 0000                   .dbfile C:\Users\jblp\DOCUME~1\PSOCDE~1.1PR\AN75320\AN75320\main.c
+                        .area data(ram, con, rel)
+ 0000                   .dbfile C:\Users\jblp\DOCUME~1\PSOCDE~1.1PR\AN75320\AN75320\main.c
+ 0000           _j::
+ 0000 0000              .word 0
+ 0002                   .dbsym e j _j I
+                        .area data(ram, con, rel)
+ 0000                   .dbfile C:\Users\jblp\DOCUME~1\PSOCDE~1.1PR\AN75320\AN75320\main.c
+                        .area data(ram, con, rel)
+ 0000                   .dbfile C:\Users\jblp\DOCUME~1\PSOCDE~1.1PR\AN75320\AN75320\main.c
+ 0000           _count_final::
+ 0000 0064              .word 100
+ 0002                   .dbsym e count_final _count_final I
+                        .area data(ram, con, rel)
+ 0000                   .dbfile C:\Users\jblp\DOCUME~1\PSOCDE~1.1PR\AN75320\AN75320\main.c
+                        .area text(rom, con, rel)
+ 0000                   .dbfile C:\Users\jblp\DOCUME~1\PSOCDE~1.1PR\AN75320\AN75320\main.c
+ 0000                   .dbfunc e main _main fV
+ 0000           ;      LCDBuffer -> X+0
+ 0000           _main::
+ 0000                   .dbline -1
+ 0000 10                push X
+ 0001 4F                mov X,SP
+ 0002 3810              add SP,16
+ 0004                   .dbline 24
+ 0004           ; //----------------------------------------------------------------------------
+ 0004           ; // C main line
+ 0004           ; //----------------------------------------------------------------------------
+ 0004           ; 
+ 0004           ; #include <m8c.h>        // part specific constants and macros
+ 0004           ; #include "PSoCAPI.h"    // PSoC API definitions for all User Modules
+ 0004           ; #include "stdio.h"
+ 0004           ; #include "stdlib.h"
+ 0004           ; 
+ 0004           ; //Port0_0 = Count up Button
+ 0004           ; //Port1_0 = Set Button (input - for setting stage)and Buzzer (output - for sensing stage) 
+ 0004           ; //Port0_1 = Proximity Sensor
+ 0004           ; //Port2   = LCD
+ 0004           ; 
+ 0004           ; int ButtonState;
+ 0004           ; int ButtonLastState;
+ 0004           ; 
+ 0004           ; int i = 100;
+ 0004           ; int j = 0;
+ 0004           ; int k;
+ 0004           ; int count_final   = 100;
+ 0004           ; 
+ 0004           ; void main(void)
+ 0004           ; {
+ 0004                   .dbline 29
+ 0004           ;       // M8C_EnableGInt ; // Uncomment this line to enable Global Interrupts
+ 0004           ;       // Insert your main routine code here.
+ 0004           ;       /* Buffer used for the long to ASCII conversion */
+ 0004           ;       char LCDBuffer[16];
+ 0004           ;     LCD_1_Start();
+ 0004 10                push X
+ 0005 7C0000            xcall _LCD_1_Start
+ 0008 20                pop X
+ 0009                   .dbline 31
+ 0009           ;       
+ 0009           ;       LCD_1_Position(0,0); LCD_1_PrCString("Sensor Interface");
+ 0009 10                push X
+ 000A 5000              mov A,0
+ 000C 5C                mov X,A
+ 000D 7C0000            xcall _LCD_1_Position
+ 0010 20                pop X
+ 0011                   .dbline 31
+ 0011 10                push X
+ 0012 504D              mov A,>L2
+ 0014 08                push A
+ 0015 504D              mov A,<L2
+ 0017 5C                mov X,A
+ 0018 18                pop A
+ 0019 7C0000            xcall _LCD_1_PrCString
+ 001C 20                pop X
+ 001D                   .dbline 32
+ 001D           ;       LCD_1_Position(1,0); LCD_1_PrCString("SetScan#:");
+ 001D 10                push X
+ 001E 5700              mov X,0
+ 0020 5001              mov A,1
+ 0022 7C0000            xcall _LCD_1_Position
+ 0025 20                pop X
+ 0026                   .dbline 32
+ 0026 10                push X
+ 0027 5043              mov A,>L3
+ 0029 08                push A
+ 002A 5043              mov A,<L3
+ 002C 5C                mov X,A
+ 002D 18                pop A
+ 002E 7C0000            xcall _LCD_1_PrCString
+ 0031 20                pop X
+ 0032 808E              xjmp L5
+ 0034           L4:
+ 0034                   .dbline 36
+ 0034           ;       
+ 0034           ;       //if set is not pushed down, continue count
+ 0034           ;       while( PRT1DR & 0x01 )
+ 0034           ;       {
+ 0034                   .dbline 37
+ 0034           ;               LCD_1_Position(1,11); LCD_1_PrHexInt(count_final);
+ 0034 10                push X
+ 0035 570B              mov X,11
+ 0037 5001              mov A,1
+ 0039 7C0000            xcall _LCD_1_Position
+ 003C 20                pop X
+ 003D                   .dbline 37
+ 003D 10                push X
+ 003E 62D000            mov REG[0xd0],>_count_final
+ 0041 5100              mov A,[_count_final]
+ 0043 08                push A
+ 0044 5101              mov A,[_count_final+1]
+ 0046 20                pop X
+ 0047 7C0000            xcall _LCD_1_PrHexInt
+ 004A 20                pop X
+ 004B                   .dbline 39
+ 004B           ;               
+ 004B           ;               if( PRT0DR & 0x01) {    ButtonState = 0;        }
+ 004B 5D00              mov A,REG[0]
+ 004D 62D000            mov REG[0xd0],>__r0
+ 0050 5300              mov [__r0],A
+ 0052 470001            tst [__r0],1
+ 0055 A00C              jz L7
+ 0057                   .dbline 39
+ 0057                   .dbline 39
+ 0057 62D000            mov REG[0xd0],>_ButtonState
+ 005A 550100            mov [_ButtonState+1],0
+ 005D 550000            mov [_ButtonState],0
+ 0060                   .dbline 39
+ 0060 800A              xjmp L8
+ 0062           L7:
+ 0062                   .dbline 40
+ 0062           ;               else                       {    ButtonState = 1;        }
+ 0062                   .dbline 40
+ 0062 62D000            mov REG[0xd0],>_ButtonState
+ 0065 550101            mov [_ButtonState+1],1
+ 0068 550000            mov [_ButtonState],0
+ 006B                   .dbline 40
+ 006B           L8:
+ 006B                   .dbline 42
+ 006B           ; 
+ 006B           ;               if( (ButtonState == 1) && (ButtonLastState == 0) )
+ 006B 62D000            mov REG[0xd0],>_ButtonState
+ 006E 3C0000            cmp [_ButtonState],0
+ 0071 B013              jnz L9
+ 0073 3C0101            cmp [_ButtonState+1],1
+ 0076 B00E              jnz L9
+ 0078           X1:
+ 0078 62D000            mov REG[0xd0],>_ButtonLastState
+ 007B 3C0000            cmp [_ButtonLastState],0
+ 007E B006              jnz L9
+ 0080 3C0100            cmp [_ButtonLastState+1],0
+ 0083 B001              jnz L9
+ 0085           X2:
+ 0085                   .dbline 43
+ 0085           ;               {   
+ 0085                   .dbline 45
+ 0085           ;                       //do nothing
+ 0085           ;               }
+ 0085           L9:
+ 0085                   .dbline 46
+ 0085           ;               if( (ButtonState == 0) && (ButtonLastState == 1) )
+ 0085 62D000            mov REG[0xd0],>_ButtonState
+ 0088 3C0000            cmp [_ButtonState],0
+ 008B B025              jnz L11
+ 008D 3C0100            cmp [_ButtonState+1],0
+ 0090 B020              jnz L11
+ 0092           X3:
+ 0092 62D000            mov REG[0xd0],>_ButtonLastState
+ 0095 3C0000            cmp [_ButtonLastState],0
+ 0098 B018              jnz L11
+ 009A 3C0101            cmp [_ButtonLastState+1],1
+ 009D B013              jnz L11
+ 009F           X4:
+ 009F                   .dbline 47
+ 009F           ;               {   
+ 009F                   .dbline 49
+ 009F           ;                       //increment the count
+ 009F           ;                       i = i + 10;
+ 009F 62D000            mov REG[0xd0],>_i
+ 00A2 06010A            add [_i+1],10
+ 00A5 0E0000            adc [_i],0
+ 00A8                   .dbline 50
+ 00A8           ;                       count_final = count_final + 10;
+ 00A8 62D000            mov REG[0xd0],>_count_final
+ 00AB 06010A            add [_count_final+1],10
+ 00AE 0E0000            adc [_count_final],0
+ 00B1                   .dbline 51
+ 00B1           ;               }
+ 00B1           L11:
+ 00B1                   .dbline 52
+ 00B1           ;               ButtonLastState = ButtonState;
+ 00B1 62D000            mov REG[0xd0],>_ButtonState
+ 00B4 5101              mov A,[_ButtonState+1]
+ 00B6 08                push A
+ 00B7 5100              mov A,[_ButtonState]
+ 00B9 62D000            mov REG[0xd0],>_ButtonLastState
+ 00BC 5300              mov [_ButtonLastState],A
+ 00BE 18                pop A
+ 00BF 5301              mov [_ButtonLastState+1],A
+ 00C1                   .dbline 53
+ 00C1           ;       }
+ 00C1           L5:
+ 00C1                   .dbline 35
+ 00C1 5D04              mov A,REG[0x4]
+ 00C3 62D000            mov REG[0xd0],>__r0
+ 00C6 5300              mov [__r0],A
+ 00C8 470001            tst [__r0],1
+ 00CB BF68              jnz L4
+ 00CD                   .dbline 55
+ 00CD           ;       
+ 00CD           ;       LCD_1_Position(0,0); LCD_1_PrCString("                 ");
+ 00CD 10                push X
+ 00CE 5000              mov A,0
+ 00D0 5C                mov X,A
+ 00D1 7C0000            xcall _LCD_1_Position
+ 00D4 20                pop X
+ 00D5                   .dbline 55
+ 00D5 10                push X
+ 00D6 5031              mov A,>L13
+ 00D8 08                push A
+ 00D9 5031              mov A,<L13
+ 00DB 5C                mov X,A
+ 00DC 18                pop A
+ 00DD 7C0000            xcall _LCD_1_PrCString
+ 00E0 20                pop X
+ 00E1                   .dbline 56
+ 00E1           ;       LCD_1_Position(0,0); LCD_1_PrCString("Sense Mode!");
+ 00E1 10                push X
+ 00E2 5000              mov A,0
+ 00E4 5C                mov X,A
+ 00E5 7C0000            xcall _LCD_1_Position
+ 00E8 20                pop X
+ 00E9                   .dbline 56
+ 00E9 10                push X
+ 00EA 5025              mov A,>L14
+ 00EC 08                push A
+ 00ED 5025              mov A,<L14
+ 00EF 5C                mov X,A
+ 00F0 18                pop A
+ 00F1 7C0000            xcall _LCD_1_PrCString
+ 00F4 20                pop X
+ 00F5                   .dbline 58
+ 00F5           ;       
+ 00F5           ;       j = i;
+ 00F5 62D000            mov REG[0xd0],>_i
+ 00F8 5101              mov A,[_i+1]
+ 00FA 08                push A
+ 00FB 5100              mov A,[_i]
+ 00FD 62D000            mov REG[0xd0],>_j
+ 0100 5300              mov [_j],A
+ 0102 18                pop A
+ 0103 5301              mov [_j+1],A
+ 0105 819F              xjmp L16
+ 0107           L15:
+ 0107                   .dbline 61
+ 0107           ;    
+ 0107           ;       while( 1 )
+ 0107           ;       {
+ 0107                   .dbline 63
+ 0107           ;               
+ 0107           ;               LCD_1_Position(1,0); LCD_1_PrCString("CountScan#:     ");
+ 0107 10                push X
+ 0108 5700              mov X,0
+ 010A 5001              mov A,1
+ 010C 7C0000            xcall _LCD_1_Position
+ 010F 20                pop X
+ 0110                   .dbline 63
+ 0110 10                push X
+ 0111 5014              mov A,>L18
+ 0113 08                push A
+ 0114 5014              mov A,<L18
+ 0116 5C                mov X,A
+ 0117 18                pop A
+ 0118 7C0000            xcall _LCD_1_PrCString
+ 011B 20                pop X
+ 011C                   .dbline 64
+ 011C           ;               LCD_1_Position(1,12); LCD_1_PrHexInt(j);
+ 011C 10                push X
+ 011D 570C              mov X,12
+ 011F 5001              mov A,1
+ 0121 7C0000            xcall _LCD_1_Position
+ 0124 20                pop X
+ 0125                   .dbline 64
+ 0125 10                push X
+ 0126 62D000            mov REG[0xd0],>_j
+ 0129 5100              mov A,[_j]
+ 012B 08                push A
+ 012C 5101              mov A,[_j+1]
+ 012E 20                pop X
+ 012F 7C0000            xcall _LCD_1_PrHexInt
+ 0132 20                pop X
+ 0133                   .dbline 66
+ 0133           ;               
+ 0133           ;               if ( j <= 1 )
+ 0133 62D000            mov REG[0xd0],>_j
+ 0136 5001              mov A,1
+ 0138 1201              sub A,[_j+1]
+ 013A 5100              mov A,[_j]
+ 013C 3180              xor A,-128
+ 013E 62D000            mov REG[0xd0],>__r0
+ 0141 5300              mov [__rX],A
+ 0143 5080              mov A,(0 ^ 0x80)
+ 0145 1A00              sbb A,[__rX]
+ 0147 C0C6              jc L19
+ 0149           X5:
+ 0149                   .dbline 67
+ 0149           ;               {       
+ 0149                   .dbline 68
+ 0149           ;                       for( k = 1; k <= 100; k++ )
+ 0149 62D000            mov REG[0xd0],>_k
+ 014C 550101            mov [_k+1],1
+ 014F 550000            mov [_k],0
+ 0152           L21:
+ 0152                   .dbline 69
+ 0152           ;                       {
+ 0152                   .dbline 70
+ 0152           ;                               LCD_1_Position(0,0); LCD_1_PrCString("                 ");
+ 0152 10                push X
+ 0153 5000              mov A,0
+ 0155 5C                mov X,A
+ 0156 7C0000            xcall _LCD_1_Position
+ 0159 20                pop X
+ 015A                   .dbline 70
+ 015A 10                push X
+ 015B 5031              mov A,>L13
+ 015D 08                push A
+ 015E 5031              mov A,<L13
+ 0160 5C                mov X,A
+ 0161 18                pop A
+ 0162 7C0000            xcall _LCD_1_PrCString
+ 0165 20                pop X
+ 0166                   .dbline 71
+ 0166           ;                               LCD_1_Position(0,0); LCD_1_PrCString("Reached!!");
+ 0166 10                push X
+ 0167 5000              mov A,0
+ 0169 5C                mov X,A
+ 016A 7C0000            xcall _LCD_1_Position
+ 016D 20                pop X
+ 016E                   .dbline 71
+ 016E 10                push X
+ 016F 500A              mov A,>L25
+ 0171 08                push A
+ 0172 500A              mov A,<L25
+ 0174 5C                mov X,A
+ 0175 18                pop A
+ 0176 7C0000            xcall _LCD_1_PrCString
+ 0179 20                pop X
+ 017A                   .dbline 72
+ 017A           ;                               PRT1DR = 0x00;
+ 017A 620400            mov REG[0x4],0
+ 017D                   .dbline 74
+ 017D           ;                
+ 017D           ;                       if( PRT0DR & 0x02) {    ButtonState = 0;        }
+ 017D 5D00              mov A,REG[0]
+ 017F 62D000            mov REG[0xd0],>__r0
+ 0182 5300              mov [__r0],A
+ 0184 470002            tst [__r0],2
+ 0187 A00C              jz L26
+ 0189                   .dbline 74
+ 0189                   .dbline 74
+ 0189 62D000            mov REG[0xd0],>_ButtonState
+ 018C 550100            mov [_ButtonState+1],0
+ 018F 550000            mov [_ButtonState],0
+ 0192                   .dbline 74
+ 0192 800A              xjmp L27
+ 0194           L26:
+ 0194                   .dbline 75
+ 0194           ;                       else                      {     ButtonState = 1;        }
+ 0194                   .dbline 75
+ 0194 62D000            mov REG[0xd0],>_ButtonState
+ 0197 550101            mov [_ButtonState+1],1
+ 019A 550000            mov [_ButtonState],0
+ 019D                   .dbline 75
+ 019D           L27:
+ 019D                   .dbline 77
+ 019D           ;          
+ 019D           ;                       if( (ButtonState == 1) && (ButtonLastState == 0) )
+ 019D 62D000            mov REG[0xd0],>_ButtonState
+ 01A0 3C0000            cmp [_ButtonState],0
+ 01A3 B013              jnz L28
+ 01A5 3C0101            cmp [_ButtonState+1],1
+ 01A8 B00E              jnz L28
+ 01AA           X6:
+ 01AA 62D000            mov REG[0xd0],>_ButtonLastState
+ 01AD 3C0000            cmp [_ButtonLastState],0
+ 01B0 B006              jnz L28
+ 01B2 3C0100            cmp [_ButtonLastState+1],0
+ 01B5 B001              jnz L28
+ 01B7           X7:
+ 01B7                   .dbline 78
+ 01B7           ;                       {   
+ 01B7                   .dbline 80
+ 01B7           ;          
+ 01B7           ;                       }
+ 01B7           L28:
+ 01B7                   .dbline 81
+ 01B7           ;                       if( (ButtonState == 0) && (ButtonLastState == 1) )
+ 01B7 62D000            mov REG[0xd0],>_ButtonState
+ 01BA 3C0000            cmp [_ButtonState],0
+ 01BD B023              jnz L30
+ 01BF 3C0100            cmp [_ButtonState+1],0
+ 01C2 B01E              jnz L30
+ 01C4           X8:
+ 01C4 62D000            mov REG[0xd0],>_ButtonLastState
+ 01C7 3C0000            cmp [_ButtonLastState],0
+ 01CA B016              jnz L30
+ 01CC 3C0101            cmp [_ButtonLastState+1],1
+ 01CF B011              jnz L30
+ 01D1           X9:
+ 01D1                   .dbline 82
+ 01D1           ;                       {   
+ 01D1                   .dbline 83
+ 01D1           ;                                       j=i;
+ 01D1 62D000            mov REG[0xd0],>_i
+ 01D4 5101              mov A,[_i+1]
+ 01D6 08                push A
+ 01D7 5100              mov A,[_i]
+ 01D9 62D000            mov REG[0xd0],>_j
+ 01DC 5300              mov [_j],A
+ 01DE 18                pop A
+ 01DF 5301              mov [_j+1],A
+ 01E1                   .dbline 84
+ 01E1           ;                       }
+ 01E1           L30:
+ 01E1                   .dbline 86
+ 01E1           ;                
+ 01E1           ;                               ButtonLastState = ButtonState;
+ 01E1 62D000            mov REG[0xd0],>_ButtonState
+ 01E4 5101              mov A,[_ButtonState+1]
+ 01E6 08                push A
+ 01E7 5100              mov A,[_ButtonState]
+ 01E9 62D000            mov REG[0xd0],>_ButtonLastState
+ 01EC 5300              mov [_ButtonLastState],A
+ 01EE 18                pop A
+ 01EF 5301              mov [_ButtonLastState+1],A
+ 01F1                   .dbline 87
+ 01F1           ;                       };
+ 01F1           L22:
+ 01F1                   .dbline 68
+ 01F1 62D000            mov REG[0xd0],>_k
+ 01F4 7601              inc [_k+1]
+ 01F6 0E0000            adc [_k],0
+ 01F9                   .dbline 68
+ 01F9 5064              mov A,100
+ 01FB 1201              sub A,[_k+1]
+ 01FD 5100              mov A,[_k]
+ 01FF 3180              xor A,-128
+ 0201 62D000            mov REG[0xd0],>__r0
+ 0204 5300              mov [__rX],A
+ 0206 5080              mov A,(0 ^ 0x80)
+ 0208 1A00              sbb A,[__rX]
+ 020A DF47              jnc L21
+ 020C           X10:
+ 020C                   .dbline 87
+ 020C                   .dbline 88
+ 020C           ;               }
+ 020C 802C              xjmp L20
+ 020E           L19:
+ 020E                   .dbline 91
+ 020E           ;       
+ 020E           ;               else
+ 020E           ;               {
+ 020E                   .dbline 92
+ 020E           ;                       LCD_1_Position(0,0); LCD_1_PrCString("                 ");
+ 020E 10                push X
+ 020F 5000              mov A,0
+ 0211 5C                mov X,A
+ 0212 7C0000            xcall _LCD_1_Position
+ 0215 20                pop X
+ 0216                   .dbline 92
+ 0216 10                push X
+ 0217 5031              mov A,>L13
+ 0219 08                push A
+ 021A 5031              mov A,<L13
+ 021C 5C                mov X,A
+ 021D 18                pop A
+ 021E 7C0000            xcall _LCD_1_PrCString
+ 0221 20                pop X
+ 0222                   .dbline 93
+ 0222           ;                       LCD_1_Position(0,0); LCD_1_PrCString("Counting!");
+ 0222 10                push X
+ 0223 5000              mov A,0
+ 0225 5C                mov X,A
+ 0226 7C0000            xcall _LCD_1_Position
+ 0229 20                pop X
+ 022A                   .dbline 93
+ 022A 10                push X
+ 022B 5000              mov A,>L32
+ 022D 08                push A
+ 022E 5000              mov A,<L32
+ 0230 5C                mov X,A
+ 0231 18                pop A
+ 0232 7C0000            xcall _LCD_1_PrCString
+ 0235 20                pop X
+ 0236                   .dbline 94
+ 0236           ;                       PRT1DR = 0x01;
+ 0236 620401            mov REG[0x4],1
+ 0239                   .dbline 95
+ 0239           ;               }
+ 0239           L20:
+ 0239                   .dbline 97
+ 0239           ;               
+ 0239           ;               if( PRT0DR & 0x02) {    ButtonState = 0;        }
+ 0239 5D00              mov A,REG[0]
+ 023B 62D000            mov REG[0xd0],>__r0
+ 023E 5300              mov [__r0],A
+ 0240 470002            tst [__r0],2
+ 0243 A00C              jz L33
+ 0245                   .dbline 97
+ 0245                   .dbline 97
+ 0245 62D000            mov REG[0xd0],>_ButtonState
+ 0248 550100            mov [_ButtonState+1],0
+ 024B 550000            mov [_ButtonState],0
+ 024E                   .dbline 97
+ 024E 800A              xjmp L34
+ 0250           L33:
+ 0250                   .dbline 98
+ 0250           ;               else                           {        ButtonState = 1;        }
+ 0250                   .dbline 98
+ 0250 62D000            mov REG[0xd0],>_ButtonState
+ 0253 550101            mov [_ButtonState+1],1
+ 0256 550000            mov [_ButtonState],0
+ 0259                   .dbline 98
+ 0259           L34:
+ 0259                   .dbline 100
+ 0259           ; 
+ 0259           ;               if( (ButtonState == 1) && (ButtonLastState == 0) )
+ 0259 62D000            mov REG[0xd0],>_ButtonState
+ 025C 3C0000            cmp [_ButtonState],0
+ 025F B013              jnz L35
+ 0261 3C0101            cmp [_ButtonState+1],1
+ 0264 B00E              jnz L35
+ 0266           X11:
+ 0266 62D000            mov REG[0xd0],>_ButtonLastState
+ 0269 3C0000            cmp [_ButtonLastState],0
+ 026C B006              jnz L35
+ 026E 3C0100            cmp [_ButtonLastState+1],0
+ 0271 B001              jnz L35
+ 0273           X12:
+ 0273                   .dbline 101
+ 0273           ;               {   
+ 0273                   .dbline 103
+ 0273           ; 
+ 0273           ;               }
+ 0273           L35:
+ 0273                   .dbline 104
+ 0273           ;               if( (ButtonState == 0) && (ButtonLastState == 1) )
+ 0273 62D000            mov REG[0xd0],>_ButtonState
+ 0276 3C0000            cmp [_ButtonState],0
+ 0279 B01B              jnz L37
+ 027B 3C0100            cmp [_ButtonState+1],0
+ 027E B016              jnz L37
+ 0280           X13:
+ 0280 62D000            mov REG[0xd0],>_ButtonLastState
+ 0283 3C0000            cmp [_ButtonLastState],0
+ 0286 B00E              jnz L37
+ 0288 3C0101            cmp [_ButtonLastState+1],1
+ 028B B009              jnz L37
+ 028D           X14:
+ 028D                   .dbline 105
+ 028D           ;               {   
+ 028D                   .dbline 107
+ 028D           ;                       //Sensor Became Low (Activated Proximity)
+ 028D           ;                       j--;
+ 028D 62D000            mov REG[0xd0],>_j
+ 0290 7A01              dec [_j+1]
+ 0292 1E0000            sbb [_j],0
+ 0295                   .dbline 108
+ 0295           ;               }
+ 0295           L37:
+ 0295                   .dbline 109
+ 0295           ;               ButtonLastState = ButtonState;          
+ 0295 62D000            mov REG[0xd0],>_ButtonState
+ 0298 5101              mov A,[_ButtonState+1]
+ 029A 08                push A
+ 029B 5100              mov A,[_ButtonState]
+ 029D 62D000            mov REG[0xd0],>_ButtonLastState
+ 02A0 5300              mov [_ButtonLastState],A
+ 02A2 18                pop A
+ 02A3 5301              mov [_ButtonLastState+1],A
+ 02A5                   .dbline 110
+ 02A5           ;       }
+ 02A5           L16:
+ 02A5                   .dbline 60
+ 02A5 8E61              xjmp L15
+ 02A7           X0:
+ 02A7                   .dbline -2
+ 02A7           L1:
+ 02A7 38F0              add SP,-16
+ 02A9 20                pop X
+ 02AA                   .dbline 0 ; func end
+ 02AA 8FFF              jmp .
+ 02AC                   .dbsym l LCDBuffer 0 A[16:16]c
+ 02AC                   .dbend
+                        .area data(ram, con, rel)
+ 0000                   .dbfile C:\Users\jblp\DOCUME~1\PSOCDE~1.1PR\AN75320\AN75320\main.c
+ 0000           _k::
+ 0000 0000              .byte 0,0
+ 0002                   .dbsym e k _k I
+                        .area data(ram, con, rel)
+ 0000                   .dbfile C:\Users\jblp\DOCUME~1\PSOCDE~1.1PR\AN75320\AN75320\main.c
+ 0000           _ButtonLastState::
+ 0000 0000              .byte 0,0
+ 0002                   .dbsym e ButtonLastState _ButtonLastState I
+                        .area data(ram, con, rel)
+ 0000                   .dbfile C:\Users\jblp\DOCUME~1\PSOCDE~1.1PR\AN75320\AN75320\main.c
+ 0000           _ButtonState::
+ 0000 0000              .byte 0,0
+ 0002                   .dbsym e ButtonState _ButtonState I
+                        .area lit(rom, con, rel)
+ 0000           L32:
+ 0000 436F756E74696E672100      .byte 'C,'o,'u,'n,'t,'i,'n,'g,33,0
+ 000A           L25:
+ 000A 52656163686564212100      .byte 'R,'e,'a,'c,'h,'e,'d,33,33,0
+ 0014           L18:
+ 0014 436F756E745363616E233A2020202020  .byte 'C,'o,'u,'n,'t,'S,'c,'a,'n,35,58,32,32,32,32,32
+ 0024 00                .byte 0
+ 0025           L14:
+ 0025 53656E7365204D6F64652100  .byte 'S,'e,'n,'s,'e,32,'M,'o,'d,'e,33,0
+ 0031           L13:
+ 0031 20202020202020202020202020202020  .byte 32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32
+ 0041 2000              .byte 32,0
+ 0043           L3:
+ 0043 5365745363616E233A00      .byte 'S,'e,'t,'S,'c,'a,'n,35,58,0
+ 004D           L2:
+ 004D 53656E736F7220496E74657266616365  .byte 'S,'e,'n,'s,'o,'r,32,'I,'n,'t,'e,'r,'f,'a,'c,'e
+ 005D 00                .byte 0
